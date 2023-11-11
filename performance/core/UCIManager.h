@@ -18,4 +18,6 @@ public:
     void stopEngine();
     void sendCommand(const std::string& command);
     std::string getBestMove();
+private:
+    FILE* stockfishProcess;
 };
