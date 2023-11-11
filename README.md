@@ -1,14 +1,19 @@
 # Versões Experimentais
 
 Algoritimo: `Stockfish 16 Strong open source chess engine`<br><br>
-Instalação Plataforma Linux x86_64 amd64:
-Meu setup:<br>
-CPU: Intel i5 12th<br>
-GPU: NVIDIA RTX 3050 *Otimizada para redes neurais*<br>
-Mem: 24Gb<br>
+Linguagens: Python🐍 C++🦞 Rust🦀<br><br>
+**Instalação Plataforma Linux x86_64 amd64 🐧**
 
-Setup para treinamento do modelo:<br>
-GPU: NVIDIA Tesla T4 Neural Optimization<br>
+Meu setup ⚙️<br>
+```sh
+CPU: Intel i5 12th
+GPU: NVIDIA RTX 3050 Otimizada para redes neurais
+Mem: 24Gb
+
+Setup para treinamento do modelo:
+GPU: NVIDIA Tesla T4 Neural Optimization
+```
+Instalação do Stockfish 🐟
 ```sh
 git clone https://github.com/official-stockfish/Stockfish.git
 cd Stockfish
