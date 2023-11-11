@@ -7,7 +7,7 @@ Linguagens: Python🐍 C++🦞 Rust🦀<br><br>
 Meu setup ⚙️<br>
 ```sh
 CPU: Intel i5 12th
-GPU: NVIDIA RTX 3050 Otimizada para redes neurais
+GPU: NVIDIA RTX 3050 Otimizada para redes neurais 🧠
 Mem: 24Gb
 
 Setup para treinamento do modelo:
