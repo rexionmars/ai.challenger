@@ -22,11 +22,11 @@ make -j12 profile-build ARCH=x86-64-avx2
 ```
 
 # Relacionados
-*Autor: João Leonardi*
-<br>**Neural Network Library for C lang.**<br>
+*Autor: João Leonardi*<br>
+<br>**Neural Network Library for C lang 🧠**<br>
 A collection of library for Deep Learning
 https://github.com/rexionmars/neural-network-library
-<br>**CTorch**<br>
+<br>**CTorch 🔥**<br>
 A next library stb-style header-only library for Neural Networks
 https://github.com/rexionmars/ctorch
 
