@@ -1,9 +1,15 @@
+/*
+ * Copyright (C) 2023 João Leonardi (joao_leonardi.melo@somosicev.com)
+ * Copyright (C) 2023 Enzo Morais (enzo.goncalves@somosicev.com)
+ * Copyright (C) 2023 João Vinícius (joao_vinicius.carvalho@somosicev.com)
+ */
+
 #include <iostream>
 #include <string>
 #include <cstdio>
 
 int main() {
-    FILE *stockfish = popen("stockfish", "r+");
+    FILE *stockfish = popen("../../../algoritimos/stockfish/src/stockfish", "r+");
     if (!stockfish) {
         std::cerr << "Erro ao abrir o Stockfish." << std::endl;
         return -1;
