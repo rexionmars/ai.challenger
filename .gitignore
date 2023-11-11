@@ -1,3 +1,4 @@
 algoritimos/alpha.zero/*
-algoritimos/stockfish/*
+algoritimos/stockfish/src/*
+performance/core/*.out
 venv
