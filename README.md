@@ -6,6 +6,7 @@ Linguagens: Python🐍 C++🦞 Rust🦀<br><br>
 
 Meu setup ⚙️<br>
 ```sh
+OS: Linux Amd64 Kernel 6.2 Generic
 CPU: Intel i5 12th
 GPU: NVIDIA RTX 3050 Otimizada para redes neurais 🧠
 Mem: 24Gb
