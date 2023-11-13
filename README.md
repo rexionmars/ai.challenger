@@ -35,16 +35,16 @@ TGP: 95W
 ai.challenger (VOLTS ⚡️)
     |
     +--- engine/ -- Engines
-          |
-          +--- Lc0
-          +--- stockfish
+    |     |
+    |     +--- Lc0
+    |     +--- stockfish
     |
     +-- performance/inference -- Inferência para a comunicação com as engines.
-                  |
-                  +--- main.cpp
-                  +--- UCIManager.cpp
-                  +--- UCIManager.h
-                  +--- chess_program -- binario na arquitetura x86-64 Linux contem a inferencia ao protocolo UCI.
+    |             |
+    |             +--- main.cpp
+    |             +--- UCIManager.cpp
+    |             +--- UCIManager.h
+    |             +--- chess_program -- binario na arquitetura x86-64 Linux contem a inferencia ao protocolo UCI.
     |
     +-- UI
         |
