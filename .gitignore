@@ -1,4 +1,5 @@
-algoritimos/alpha.zero/*
-algoritimos/stockfish/src/*
-performance/core/*.out
+engines/alpha.zero/*
+engines/stockfish/src/*
+engines/lc0/lc0/*
+performance/inference/*.out
 UI/venv
