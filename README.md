@@ -14,12 +14,12 @@ GPU: NVIDIA RTX 3050 Mobile Cuda cores: 2048 Neural Optimization
 Mem: 24.0 GiB
 TGP: 95W
 ```
-## Plataformas Suportadas 🔍
+## Plataformas Suportadas 💻
 - [X] Linux
 - [x] NVIDIA Jetson
 - [ ] Windows
 - [ ] MacOS
-## Algoritimos suportados 🛠
+## Algoritimos suportados 🧬
 - [x] Leela Chess Zero (testes inicias)
 - [ ] Stockfish
 - [ ] Alpha Zero
@@ -30,7 +30,7 @@ TGP: 95W
 - [x] Aceleração via GPU (nvidia)
 - [ ] AMD graphics OpenCL.
 
-## Estrutura de pastas do projeto
+## Estrutura de pastas do projeto 📂
 ```lua
 ai.challenger (VOLTS ⚡️)
     |
@@ -81,7 +81,7 @@ Se desejar compilar com um compilador diferente, passe as variáveis de ambiente
 CC=clang-6.0 CXX=clang++-6.0 ./build.sh
 ```
 
-## Projetos e papers usados como inspiração
+## Projetos e papers usados como inspiração 📄
 **Papers:**<br>
 Chess AI: Competing Paradigms for Machine Intelligence:
 https://arxiv.org/pdf/2109.11602.pdf<br>
