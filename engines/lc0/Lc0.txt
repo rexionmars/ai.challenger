@@ -1,0 +1,7 @@
+Lc0: Build para linux: https://lczero.org/dev/wiki/best-nets-for-lc0/
+========================================================================
+
+Melhor rede de pesos para o Lc0: https://lczero.org/dev/wiki/best-nets-for-lc0/
+
+Network Size 	Purpose 	Filters 	Blocks 	GPU Memory Usage 	File Size 	Network
+Large 	GPU 	768 	15 (mish activation) 	2.4 GB 	160-170 MB 	T2-768x15x24h-swa-5230000 (Right-click → “Save link as…")
