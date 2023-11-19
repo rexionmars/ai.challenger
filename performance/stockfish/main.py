@@ -15,8 +15,7 @@ def run_command_in_terminal(command: str):
     subprocess.Popen(['kitty', command])
 
 
-# Exemplo de comando para monitorar a GPU
-os_command = "htop"
+os_command = "htop" # Comando para monitorar o uso de hardware
 
 # Inicia o monitoramento da GPU em um terminal separado
 gpu_thread = threading.Thread(target=run_command_in_terminal, args=(os_command,))
@@ -28,7 +27,7 @@ class ChessUI(QMainWindow):
         super().__init__()
 
         self.board = chess.Board()
-        self.engine = chess.engine.SimpleEngine.popen_uci(algorihm_path)  # Substitua pelo caminho real
+        self.engine = chess.engine.SimpleEngine.popen_uci(algorihm_path)
 
         self.init_ui()
 
@@ -61,6 +60,24 @@ class ChessUI(QMainWindow):
         self.update_board()
         print(f'Stockfish sugere: {result.move.uci()}')
 
+    def check_game_result(self):
+        if self.board.is_checkmate():
+            print("Xeque-mate! Você perdeu.")
+            return True
+        elif self.board.is_stalemate():
+            print("Empate! O jogo terminou empatado.")
+            return True
+        elif self.board.is_insufficient_material():
+            print("Empate! Material insuficiente para xeque-mate.")
+            return True
+        elif self.board.is_seventyfive_moves():
+            print("Empate! O jogo atingiu o limite de 75 movimentos sem capturas ou movimentos de peões.")
+            return True
+        elif self.board.is_fivefold_repetition():
+            print("Empate! A posição se repetiu pela quinta vez.")
+            return True
+        return False
+
 if __name__ == '__main__':
     stockfish_path = "Stockfish/src/stockfish"
 
@@ -69,14 +86,16 @@ if __name__ == '__main__':
     chess_ui.show()
 
     while True:
-        user_move = input("Sua jogada (ou 'quit' para encerrar): ")
-        if user_move.lower() == 'quit':
-            break
+        user_move = input("V O L T S ENGINE 🔥: ")
 
         if chess.Move.from_uci(user_move) in chess_ui.board.legal_moves:
             chess_ui.board.push(chess.Move.from_uci(user_move))
             chess_ui.update_board()
+            if chess_ui.check_game_result():
+                break
             chess_ui.suggest_move()
+            if chess_ui.check_game_result():
+                break
         else:
             print('Jogada inválida. Tente novamente.')
 
