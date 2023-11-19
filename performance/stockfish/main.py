@@ -1,16 +1,34 @@
 import sys
+import subprocess
+import os
+import threading
+
 import chess
 import chess.svg
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtSvg import QSvgWidget
 import chess.engine
 
+
+def run_command_in_terminal(command: str):
+    # Abre um novo terminal e executa o comando fornecido
+    subprocess.Popen(['kitty', command])
+
+
+# Exemplo de comando para monitorar a GPU
+os_command = "htop"
+
+# Inicia o monitoramento da GPU em um terminal separado
+gpu_thread = threading.Thread(target=run_command_in_terminal, args=(os_command,))
+gpu_thread.start()
+gpu_thread.join()
+
 class ChessUI(QMainWindow):
-    def __init__(self):
+    def __init__(self, algorihm_path: str):
         super().__init__()
 
         self.board = chess.Board()
-        self.engine = chess.engine.SimpleEngine.popen_uci("/home/remix/wrkdir/my/ai.challenger/performance/stockfish/Stockfish/src/stockfish")  # Substitua pelo caminho real
+        self.engine = chess.engine.SimpleEngine.popen_uci(algorihm_path)  # Substitua pelo caminho real
 
         self.init_ui()
 
@@ -44,8 +62,10 @@ class ChessUI(QMainWindow):
         print(f'Stockfish sugere: {result.move.uci()}')
 
 if __name__ == '__main__':
+    stockfish_path = "Stockfish/src/stockfish"
+
     app = QApplication(sys.argv)
-    chess_ui = ChessUI()
+    chess_ui = ChessUI(stockfish_path)
     chess_ui.show()
 
     while True:
