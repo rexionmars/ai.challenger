@@ -1,7 +1,14 @@
-Lc0: Build para linux: https://lczero.org/dev/wiki/best-nets-for-lc0/
+Lc0: Build usando o codigo font: https://github.com/LeelaChessZero/lc0/blob/master/README.md#building-and-running-lc0
 ========================================================================
 
 Melhor rede de pesos para o Lc0: https://lczero.org/dev/wiki/best-nets-for-lc0/
 
 Network Size 	Purpose 	Filters 	Blocks 	GPU Memory Usage 	File Size 	Network
 Large 	GPU 	768 	15 (mish activation) 	2.4 GB 	160-170 MB 	T2-768x15x24h-swa-5230000 (Right-click → “Save link as…")
+
+Instalação dos pesos:
+crie uma nova pasta chamadade "weights" em engines/lc0/
+
+mkdir engines/lc0/weights
+
+Extrai o modelo que está dentro de arquivo.pb.gz, copie o arquivo extraido .pb, para a pasta que criamos logo acima.
