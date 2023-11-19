@@ -21,8 +21,8 @@ TGP: 95W
 - [ ] Windows
 - [ ] MacOS
 ## Algoritimos suportados 🧬
-- [x] Leela Chess Zero (testes inicias)
-- [ ] Stockfish
+- [ ] Leela Chess Zero (testes inicias)
+- [x] Stockfish
 - [ ] Alpha Zero
 - [ ] Minmax (integração manual)
 
