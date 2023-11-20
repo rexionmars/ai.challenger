@@ -8,18 +8,9 @@ import chess.engine
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtSvg import QSvgWidget
 from art import *
+import matplotlib.pyplot as plt
 
 from utils.Utils import Colors, writelnc
-
-def run_command_in_terminal(command: str):
-    subprocess.Popen(["kitty", command])
-
-os_command = "htop"  # Comando para monitorar o uso de hardware
-
-# Inicia o monitoramento da GPU em um terminal separado
-gpu_thread = threading.Thread(target=run_command_in_terminal, args=(os_command,))
-gpu_thread.start()
-gpu_thread.join()
 
 class ChessUI(QMainWindow):
     def __init__(self, algorithm_path: str):
@@ -35,6 +26,12 @@ class ChessUI(QMainWindow):
 
         # Configuração das opções (Threads, Hash, etc.)
         self.engine.configure({"Threads": 12, "Hash": 512})
+
+        # Dados para os gráficos
+        self.depth_values = []
+        self.time_values = []
+        self.nodes_values = []
+        self.evaluation_values = []
 
         self.init_ui()
 
@@ -62,15 +59,21 @@ class ChessUI(QMainWindow):
         self.svg_widget.show()
 
     def suggest_move(self):
-        result = self.engine.play(self.board, chess.engine.Limit(time=1.0))
+        result = self.engine.play(self.board, chess.engine.Limit(nodes=1000000, depth=20, time=5.0))
         self.board.push(result.move)
         self.update_board()
 
         # Solicita uma análise para obter informações sobre a jogada sugerida
-        info = self.engine.analyse(self.board, chess.engine.Limit(depth=20))
+        info = self.engine.analyse(self.board, chess.engine.Limit(nodes=1000000, depth=20, time=5.0))
+
+        # Salva os dados para os gráficos
+        self.depth_values.append(info.get('depth', 0))
+        self.time_values.append(info.get('time', 0))
+        self.nodes_values.append(info.get('nodes', 0))
+        self.evaluation_values.append(info.get('score', {}).relative.score())
 
         # Imprime as informações
-        print(f"Stockfish sugere: {result.move.uci()}")
+        print(f"ELO: {info}, Stockfish sugere: {result.move.uci()}")
         self.print_evaluation(info)
 
     def check_game_result(self):
@@ -120,6 +123,48 @@ class ChessUI(QMainWindow):
 
         print("\n")
 
+    def plot_depth_vs_time(self):
+        plt.scatter(self.depth_values, self.time_values, color='blue')
+        plt.title('Profundidade vs. Tempo de Análise')
+        plt.xlabel('Profundidade')
+        plt.ylabel('Tempo de Análise (segundos)')
+        plt.show()
+
+    def plot_depth_vs_nodes(self):
+        plt.scatter(self.depth_values, self.nodes_values, color='green')
+        plt.title('Profundidade vs. Nós Analisados')
+        plt.xlabel('Profundidade')
+        plt.ylabel('Nós Analisados')
+        plt.show()
+
+    def plot_time_vs_evaluation(self):
+        plt.scatter(self.time_values, self.evaluation_values, color='red')
+        plt.title('Tempo de Análise vs. Avaliação')
+        plt.xlabel('Tempo de Análise (segundos)')
+        plt.ylabel('Avaliação')
+        plt.show()
+
+    def plot_depth_vs_evaluation(self):
+        plt.plot(self.depth_values, self.evaluation_values, color='purple', marker='o')
+        plt.title('Profundidade vs. Avaliação')
+        plt.xlabel('Profundidade')
+        plt.ylabel('Avaliação')
+        plt.show()
+
+    def plot_nodes_vs_nps(self):
+        nps_values = [n / t if t != 0 else 0 for n, t in zip(self.nodes_values, self.time_values)]
+        plt.bar(['Nós Analisados', 'NPS'], [max(self.nodes_values), max(nps_values)], color=['orange', 'yellow'])
+        plt.title('Nós Analisados vs. NPS')
+        plt.ylabel('Quantidade')
+        plt.show()
+
+    def plot_evaluation_over_time(self):
+        plt.plot(self.time_values, self.evaluation_values, color='brown', marker='o')
+        plt.title('Avaliação ao Longo do Tempo')
+        plt.xlabel('Tempo (segundos)')
+        plt.ylabel('Avaliação')
+        plt.show()
+
 
 if __name__ == "__main__":
     tprint("VOLTS", font="cybermedum")
@@ -145,5 +190,13 @@ if __name__ == "__main__":
                 break
         else:
             print("Jogada inválida. Tente novamente.")
+
+    # Exibir gráficos ao finalizar
+    chess_ui.plot_depth_vs_time()
+    chess_ui.plot_depth_vs_nodes()
+    chess_ui.plot_time_vs_evaluation()
+    chess_ui.plot_depth_vs_evaluation()
+    chess_ui.plot_nodes_vs_nps()
+    chess_ui.plot_evaluation_over_time()
 
     sys.exit(app.exec_())
