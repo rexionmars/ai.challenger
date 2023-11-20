@@ -2,11 +2,12 @@ import sys
 import subprocess
 import os
 import threading
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PyQt5.QtSvg import QSvgWidget
+from PyQt5.QtCore import QTimer
 import chess
 import chess.svg
 import chess.engine
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
-from PyQt5.QtSvg import QSvgWidget
 from art import *
 import matplotlib.pyplot as plt
 
@@ -32,6 +33,10 @@ class ChessUI(QMainWindow):
         self.time_values = []
         self.nodes_values = []
         self.evaluation_values = []
+
+        # Controle de threading
+        self.plot_timer = QTimer()
+        self.plot_timer.timeout.connect(self.plot_graphs)
 
         self.init_ui()
 
@@ -75,6 +80,9 @@ class ChessUI(QMainWindow):
         # Imprime as informações
         print(f"ELO: {info}, Stockfish sugere: {result.move.uci()}")
         self.print_evaluation(info)
+
+        # Inicia temporizador para plotar gráficos
+        self.plot_timer.start(0)
 
     def check_game_result(self):
         if self.board.is_checkmate():
@@ -122,6 +130,18 @@ class ChessUI(QMainWindow):
             print("Tempo de análise não disponível.")
 
         print("\n")
+
+    def plot_graphs(self):
+        # Parar temporizador para evitar chamadas concorrentes
+        self.plot_timer.stop()
+
+        # Plotar gráficos após cada jogada
+        self.plot_depth_vs_time()
+        self.plot_depth_vs_nodes()
+        self.plot_time_vs_evaluation()
+        self.plot_depth_vs_evaluation()
+        self.plot_nodes_vs_nps()
+        self.plot_evaluation_over_time()
 
     def plot_depth_vs_time(self):
         plt.scatter(self.depth_values, self.time_values, color='blue')
@@ -190,13 +210,5 @@ if __name__ == "__main__":
                 break
         else:
             print("Jogada inválida. Tente novamente.")
-
-    # Exibir gráficos ao finalizar
-    chess_ui.plot_depth_vs_time()
-    chess_ui.plot_depth_vs_nodes()
-    chess_ui.plot_time_vs_evaluation()
-    chess_ui.plot_depth_vs_evaluation()
-    chess_ui.plot_nodes_vs_nps()
-    chess_ui.plot_evaluation_over_time()
 
     sys.exit(app.exec_())
