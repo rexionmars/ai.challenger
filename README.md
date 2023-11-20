@@ -81,6 +81,11 @@ Se desejar compilar com um compilador diferente, passe as variáveis de ambiente
 ```sh
 CC=clang-6.0 CXX=clang++-6.0 ./build.sh
 ```
+## Avaliação em tempo real da partida
+
+<div align="center">
+  <img src="images/Screenshot from 2023-11-18 23-50-22.png" alt="Snake logo">
+</div>
 
 ## Projetos e papers usados como inspiração 📄
 **Papers:**<br>
