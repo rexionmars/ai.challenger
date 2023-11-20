@@ -9,18 +9,21 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtSvg import QSvgWidget
 import chess.engine
 
+from utils.Utils import Colors, writelnc
+
 
 def run_command_in_terminal(command: str):
     # Abre um novo terminal e executa o comando fornecido
-    subprocess.Popen(['kitty', command])
+    subprocess.Popen(["kitty", command])
 
 
-os_command = "htop" # Comando para monitorar o uso de hardware
+os_command = "htop"  # Comando para monitorar o uso de hardware
 
 # Inicia o monitoramento da GPU em um terminal separado
 gpu_thread = threading.Thread(target=run_command_in_terminal, args=(os_command,))
 gpu_thread.start()
 gpu_thread.join()
+
 
 class ChessUI(QMainWindow):
     def __init__(self, algorihm_path: str):
@@ -42,7 +45,7 @@ class ChessUI(QMainWindow):
         layout.addWidget(self.svg_widget)
 
         self.setGeometry(100, 100, 600, 600)
-        self.setWindowTitle('Chess UI')
+        self.setWindowTitle("Chess UI")
 
     def update_board(self):
         svg_data = chess.svg.board(self.board)
@@ -58,7 +61,7 @@ class ChessUI(QMainWindow):
         result = self.engine.play(self.board, chess.engine.Limit(time=1.0))
         self.board.push(result.move)
         self.update_board()
-        print(f'Stockfish sugere: {result.move.uci()}')
+        print(f"Stockfish sugere: {result.move.uci()}")
 
     def check_game_result(self):
         if self.board.is_checkmate():
@@ -78,15 +81,16 @@ class ChessUI(QMainWindow):
             return True
         return False
 
-if __name__ == '__main__':
-    stockfish_path = "Stockfish/src/stockfish"
+
+if __name__ == "__main__":
+    stockfish_path = "../../engines/stockfish/Stockfish/src/stockfish"
 
     app = QApplication(sys.argv)
     chess_ui = ChessUI(stockfish_path)
     chess_ui.show()
 
     while True:
-        user_move = input("V O L T S ENGINE 🔥: ")
+        user_move = input(f"{Colors.YELLOW}V O L T S ENGINE{Colors.RESET} 🔥: ")
 
         if chess.Move.from_uci(user_move) in chess_ui.board.legal_moves:
             chess_ui.board.push(chess.Move.from_uci(user_move))
@@ -97,6 +101,6 @@ if __name__ == '__main__':
             if chess_ui.check_game_result():
                 break
         else:
-            print('Jogada inválida. Tente novamente.')
+            print("Jogada inválida. Tente novamente.")
 
     sys.exit(app.exec_())
