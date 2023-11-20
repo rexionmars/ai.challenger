@@ -2,6 +2,7 @@ import sys
 import subprocess
 import os
 import threading
+import re
 
 import chess
 import chess.svg
@@ -35,7 +36,6 @@ class ChessUI(QMainWindow):
 
         self.init_ui()
 
-
     def init_ui(self):
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
@@ -49,7 +49,6 @@ class ChessUI(QMainWindow):
         self.setGeometry(100, 100, 600, 600)
         self.setWindowTitle("Chess UI")
 
-
     def update_board(self):
         svg_data = chess.svg.board(self.board)
         svg_filename = "board.svg"
@@ -60,31 +59,68 @@ class ChessUI(QMainWindow):
         self.svg_widget.load(svg_filename)
         self.svg_widget.show()
 
-
     def suggest_move(self):
         result = self.engine.play(self.board, chess.engine.Limit(time=1.0))
         self.board.push(result.move)
         self.update_board()
-        print(f"Stockfish sugere: {result.move.uci()}")
 
+        # Solicita uma análise para obter informações sobre a jogada sugerida
+        info = self.engine.analyse(self.board, chess.engine.Limit(depth=20))
+
+        # Imprime as informações
+        print(f"Stockfish sugere: {result.move.uci()}")
+        self.print_evaluation(info)
+ 
 
     def check_game_result(self):
         if self.board.is_checkmate():
-            print("Xeque-mate! Você perdeu. 💔😢")
+            print("Xeque-mate! Você perdeu.")
             return True
         elif self.board.is_stalemate():
-            print("Empate! O jogo terminou empatado. 🤝😐")
+            print("Empate! O jogo terminou empatado.")
             return True
         elif self.board.is_insufficient_material():
-            print("Empate! Material insuficiente para xeque-mate. 🤝😐")
+            print("Empate! Material insuficiente para xeque-mate.")
             return True
         elif self.board.is_seventyfive_moves():
-            print("Empate! O jogo atingiu o limite de 75 movimentos sem capturas ou movimentos de peões. 🤝😐")
+            print("Empate! O jogo atingiu o limite de 75 movimentos sem capturas ou movimentos de peões.")
             return True
         elif self.board.is_fivefold_repetition():
-            print("Empate! A posição se repetiu pela quinta vez. 🤝😐")
+            print("Empate! A posição se repetiu pela quinta vez.")
             return True
         return False
+
+    def print_evaluation(self, info):
+        if 'score' in info:
+            print(f"Avaliação: {info['score']}")
+        else:
+            print("Avaliação não disponível.")
+
+        if 'pv' in info:
+            principal_variation = info['pv']
+            print(f"Variação Principal: {principal_variation}")
+        else:
+            print("Variação Principal não disponível.")
+
+        if 'depth' in info:
+            print(f"Profundidade: {info['depth']}")
+        else:
+            print("Profundidade não disponível.")
+
+        if 'nodes' in info:
+            print(f"Nós analisados: {info['nodes']}")
+        else:
+            print("Nós analisados não disponíveis.")
+
+        if 'time' in info:
+            print(f"Tempo de análise: {info['time']} segundos")
+        else:
+            print("Tempo de análise não disponível.")
+
+        print("\n")
+
+ 
+ 
 
 
 if __name__ == "__main__":
@@ -98,6 +134,9 @@ if __name__ == "__main__":
 
     while True:
         user_move = input(f"{Colors.ORANGE}V O L T S ENGINE{Colors.RESET} 🔥: ")
+
+        if user_move.lower() == 'quit':
+            break
 
         if chess.Move.from_uci(user_move) in chess_ui.board.legal_moves:
             chess_ui.board.push(chess.Move.from_uci(user_move))
