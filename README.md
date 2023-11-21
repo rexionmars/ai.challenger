@@ -1,7 +1,7 @@
 <div align="center">
   <h1>VOLTS ENGINE INFERENCE ⚡️</h1>
   Este projeto permite a integração de varias engines voltadas para competições de xadrez, contem suporte a interface grafica, estatisticas de jogo, com suporte para CPU e GPU (nvidia series 30), com o protoloco UCI.<br>
-  <p>{joao_leonardi.melo, enzo.goncalves, joao_vinicius.carvalho}@somosicev.com</p>
+  <p><strong>{joao_leonardi.melo, enzo.goncalves, joao_vinicius.carvalho}@somosicev.com</strong></p>
   <img src="images/Screenshot from 2023-11-18 23-50-22.png" alt="Snake logo">
 </div>
 
