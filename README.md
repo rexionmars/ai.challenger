@@ -17,14 +17,8 @@ TGP: 95W
 ```
 ## Plataformas Suportadas 💻
 - [X] Linux
-- [x] NVIDIA Jetson
-- [ ] Windows
+- [X] Windows (WSL)
 - [ ] MacOS
-## Algoritimos suportados 🧬
-- [ ] Leela Chess Zero (testes inicias)
-- [x] Stockfish
-- [ ] Alpha Zero
-- [ ] Minmax (integração manual)
 
 ## Features Hardware (beta) 🛠
 - [x] Aceleração via CPU (intel)
@@ -54,7 +48,7 @@ ai.challenger (VOLTS ⚡️)
         +--- venv/
         +--- main.py
 ```
-
+<!--
 ## Instalção dos algoritmos
 *OBS: make -j12 somente para processadores com 12 nucleos, se o seu tiver menos ou mais nucleos, use conforme o necessario*<br>
 **Instalação do Stockfish 🐟**
@@ -81,6 +75,7 @@ Se desejar compilar com um compilador diferente, passe as variáveis de ambiente
 ```sh
 CC=clang-6.0 CXX=clang++-6.0 ./build.sh
 ```
+-->
 ## Avaliação em tempo real da partida
 
 <div align="center">
