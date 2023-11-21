@@ -84,7 +84,10 @@ CC=clang-6.0 CXX=clang++-6.0 ./build.sh
 ## Avaliação em tempo real da partida
 
 <div align="center">
-  <img src="images/Screenshot from 2023-11-18 23-50-22.png" alt="Snake logo">
+  <h4>Profundidate x Tempo de Analise</h4>
+  <img src="images/Screenshot from 2023-11-20 10-49-08.png" alt="Snake logo">
+  <h4>Avaliação ao longo do tempo</h4>
+  <img src="images/Screenshot from 2023-11-20 14-46-31.png" alt="Snake logo">
 </div>
 
 ## Projetos e papers usados como inspiração 📄
