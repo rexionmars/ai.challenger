@@ -13,30 +13,26 @@ import matplotlib.pyplot as plt
 
 from utils.Utils import Colors, writelnc
 
+
 class ChessUI(QMainWindow):
     def __init__(self, algorithm_path: str):
         super().__init__()
 
         self.board = chess.Board()
 
-        # Configuração do Stockfish
         stockfish_path = algorithm_path
 
         # Inicializa o Stockfish com as opções configuradas
         self.engine = chess.engine.SimpleEngine.popen_uci(stockfish_path)
 
         # Configuração das opções (Threads, Hash, etc.)
-        self.engine.configure({"Threads": 12, "Hash": 512})
+        self.engine.configure({"Threads": 12, "Hash": 1024})
 
         # Dados para os gráficos
         self.depth_values = []
         self.time_values = []
         self.nodes_values = []
         self.evaluation_values = []
-
-        # Controle de threading
-        self.plot_timer = QTimer()
-        self.plot_timer.timeout.connect(self.plot_graphs)
 
         self.init_ui()
 
@@ -81,8 +77,6 @@ class ChessUI(QMainWindow):
         print(f"ELO: {info}, Stockfish sugere: {result.move.uci()}")
         self.print_evaluation(info)
 
-        # Inicia temporizador para plotar gráficos
-        self.plot_timer.start(0)
 
     def check_game_result(self):
         if self.board.is_checkmate():
@@ -130,60 +124,6 @@ class ChessUI(QMainWindow):
             print("Tempo de análise não disponível.")
 
         print("\n")
-
-    def plot_graphs(self):
-        # Parar temporizador para evitar chamadas concorrentes
-        self.plot_timer.stop()
-
-        # Plotar gráficos após cada jogada
-        self.plot_depth_vs_time()
-        self.plot_depth_vs_nodes()
-        self.plot_time_vs_evaluation()
-        self.plot_depth_vs_evaluation()
-        self.plot_nodes_vs_nps()
-        self.plot_evaluation_over_time()
-
-    def plot_depth_vs_time(self):
-        plt.scatter(self.depth_values, self.time_values, color='blue')
-        plt.title('Profundidade vs. Tempo de Análise')
-        plt.xlabel('Profundidade')
-        plt.ylabel('Tempo de Análise (segundos)')
-        plt.show()
-
-    def plot_depth_vs_nodes(self):
-        plt.scatter(self.depth_values, self.nodes_values, color='green')
-        plt.title('Profundidade vs. Nós Analisados')
-        plt.xlabel('Profundidade')
-        plt.ylabel('Nós Analisados')
-        plt.show()
-
-    def plot_time_vs_evaluation(self):
-        plt.scatter(self.time_values, self.evaluation_values, color='red')
-        plt.title('Tempo de Análise vs. Avaliação')
-        plt.xlabel('Tempo de Análise (segundos)')
-        plt.ylabel('Avaliação')
-        plt.show()
-
-    def plot_depth_vs_evaluation(self):
-        plt.plot(self.depth_values, self.evaluation_values, color='purple', marker='o')
-        plt.title('Profundidade vs. Avaliação')
-        plt.xlabel('Profundidade')
-        plt.ylabel('Avaliação')
-        plt.show()
-
-    def plot_nodes_vs_nps(self):
-        nps_values = [n / t if t != 0 else 0 for n, t in zip(self.nodes_values, self.time_values)]
-        plt.bar(['Nós Analisados', 'NPS'], [max(self.nodes_values), max(nps_values)], color=['orange', 'yellow'])
-        plt.title('Nós Analisados vs. NPS')
-        plt.ylabel('Quantidade')
-        plt.show()
-
-    def plot_evaluation_over_time(self):
-        plt.plot(self.time_values, self.evaluation_values, color='brown', marker='o')
-        plt.title('Avaliação ao Longo do Tempo')
-        plt.xlabel('Tempo (segundos)')
-        plt.ylabel('Avaliação')
-        plt.show()
 
 
 if __name__ == "__main__":
