@@ -8,6 +8,7 @@ class Colors:
     MAGENTA = '\033[95m'
     CYAN = '\033[96m'
     WHITE = '\033[97m'
+    ORANGE = '\033[38;5;208m'
 
 def writelnc(text: str, color: str) -> None:
     print(f'{color}{text}{Colors.RESET}')
