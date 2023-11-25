@@ -6,28 +6,19 @@ from PyQt5.QtSvg import QSvgWidget
 import chess
 import chess.svg
 import chess.engine
-from art import *
-import matplotlib.pyplot as plt
 
 from utils.Utils import Colors, writelnc
 
 
 class ChessUI(QMainWindow):
-    def __init__(self, algorithm_path: str, player_color: str):
+    def __init__(self, engine_path: str, player_color: str):
         super().__init__()
 
+        engine = engine_path 
         self.board = chess.Board()
-
-        stockfish_path = algorithm_path
-
-        # Inicializa o Stockfish com as opções configuradas
-        self.engine = chess.engine.SimpleEngine.popen_uci(stockfish_path)
-
-        # Configuração das opções (Threads, Hash, etc.)
-        self.engine.configure({"Threads": 12, "Hash": 1024})
-
-        # Define a cor do jogador
-        self.player_color = player_color.lower()
+        self.engine = chess.engine.SimpleEngine.popen_uci(engine)
+        self.engine.configure({"Threads": 12, "Hash": 512})
+        self.player_color = player_color.lower() # Define a cor do jogador
 
         self.init_ui()
 
@@ -44,7 +35,6 @@ class ChessUI(QMainWindow):
         self.setGeometry(100, 100, 600, 600)
         self.setWindowTitle('Chess UI')
 
-        # Se o jogador escolhido for "pretas", o Stockfish faz a primeira jogada
         if self.player_color == "pretas":
             self.suggest_move()
 
@@ -59,15 +49,14 @@ class ChessUI(QMainWindow):
         self.svg_widget.show()
 
     def suggest_move(self):
-        result = self.engine.play(self.board, chess.engine.Limit(nodes=1000000, depth=20, time=5.0))
+        result = self.engine.play(self.board, chess.engine.Limit(nodes=1000000, depth=50, time=5.0))
         self.board.push(result.move)
         self.update_board()
 
         # Solicita uma análise para obter informações sobre a jogada sugerida
-        info = self.engine.analyse(self.board, chess.engine.Limit(nodes=1000000, depth=20, time=5.0))
+        info = self.engine.analyse(self.board, chess.engine.Limit(nodes=1000000, depth=50, time=5.0))
 
-        # Imprime as informações
-        print(f"ELO: {info}, Stockfish sugere: {result.move.uci()}")
+        print(f"ELO: {info}, \nMove to: {result.move.uci()}")
         self.print_evaluation(info)
 
     def check_game_result(self):
@@ -119,9 +108,8 @@ class ChessUI(QMainWindow):
 
 
 if __name__ == "__main__":
-    tprint("VOLTS", font="cybermedum")
     print("{joao_leonardi.melo, enzo.goncalves, joao_vinicius.carvalho}@somosicev.com")
-    stockfish_path = "../../engines/stockfish/Stockfish/src/stockfish"  # Substitua pelo caminho correto do seu Stockfish
+    stockfish_path = "../../engines/Stockfish/src/stockfish"  # Substitua pelo caminho correto do seu Stockfish
 
     # Solicita ao usuário que escolha a cor das peças
     while True:
