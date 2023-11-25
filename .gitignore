@@ -1,7 +1,4 @@
-engines/alpha.zero/*
-engines/stockfish/src/*
-engines/lc0/lc0/*
-engines/lc0/weights/*
+engines/Stockfish/*
 performance/inference/*.out
-performance/lc0/rust_implementation/target/*
+performance/inference/board.svg
 venv
