@@ -45,6 +45,7 @@ volts ⚡️
     +--- requeriments.txt
     +--- ubuntu_deps.txt
 ```
+<!--
 ## Avaliação em tempo real da partida
 
 <div align="center">
@@ -53,7 +54,7 @@ volts ⚡️
   <h4>Avaliação ao longo do tempo</h4>
   <img src="images/Screenshot from 2023-11-20 14-46-31.png" alt="Snake logo">
 </div>
-
+-->
 ## Projetos e papers usados como inspiração 📄
 **Papers:**<br>
 Chess AI: Competing Paradigms for Machine Intelligence:
