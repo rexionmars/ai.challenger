@@ -1,5 +1,4 @@
 import sys
-import subprocess
 import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtSvg import QSvgWidget
@@ -9,16 +8,19 @@ import chess.engine
 
 from utils.Utils import Colors, writelnc
 
-
 class ChessUI(QMainWindow):
+    SVG_FILENAME = 'board.svg'
+    ENGINE_CONFIG = {"Threads": 12, "Hash": 512}
+    ENGINE_LIMIT = chess.engine.Limit(nodes=1000000, depth=50, time=5.0)
+
     def __init__(self, engine_path: str, player_color: str):
         super().__init__()
 
-        engine = engine_path 
+        self.engine_path = engine_path
         self.board = chess.Board()
-        self.engine = chess.engine.SimpleEngine.popen_uci(engine)
-        self.engine.configure({"Threads": 12, "Hash": 512})
-        self.player_color = player_color.lower() # Define a cor do jogador
+        self.engine = chess.engine.SimpleEngine.popen_uci(engine_path)
+        self.engine.configure(self.ENGINE_CONFIG)
+        self.player_color = player_color.lower()
 
         self.init_ui()
 
@@ -40,23 +42,18 @@ class ChessUI(QMainWindow):
 
     def update_board(self):
         svg_data = chess.svg.board(self.board)
-        svg_filename = 'board.svg'
-
-        with open(svg_filename, 'w') as svg_file:
+        with open(self.SVG_FILENAME, 'w') as svg_file:
             svg_file.write(svg_data)
 
-        self.svg_widget.load(svg_filename)
+        self.svg_widget.load(self.SVG_FILENAME)
         self.svg_widget.show()
 
     def suggest_move(self):
-        result = self.engine.play(self.board, chess.engine.Limit(nodes=1000000, depth=50, time=5.0))
+        result = self.engine.play(self.board, self.ENGINE_LIMIT)
         self.board.push(result.move)
         self.update_board()
 
-        # Solicita uma análise para obter informações sobre a jogada sugerida
-        info = self.engine.analyse(self.board, chess.engine.Limit(nodes=1000000, depth=50, time=5.0))
-
-        print(f"ELO: {info}, \nMove to: {result.move.uci()}")
+        info = self.engine.analyse(self.board, self.ENGINE_LIMIT)
         self.print_evaluation(info)
 
     def check_game_result(self):
@@ -106,12 +103,10 @@ class ChessUI(QMainWindow):
 
         print("\n")
 
-
 if __name__ == "__main__":
     print("{joao_leonardi.melo, enzo.goncalves, joao_vinicius.carvalho}@somosicev.com")
-    stockfish_path = "../../engines/Stockfish/src/stockfish"  # Substitua pelo caminho correto do seu Stockfish
+    stockfish_path = "ALGO_PATH"
 
-    # Solicita ao usuário que escolha a cor das peças
     while True:
         player_color = input("Escolha a cor das peças (brancas/pretas): ").lower()
         if player_color in ["brancas", "pretas"]:
@@ -124,7 +119,7 @@ if __name__ == "__main__":
     chess_ui.show()
 
     while True:
-        user_move = input(f"{Colors.ORANGE}V O L T S ENGINE{Colors.RESET} 🔥: ")
+        user_move = input(f"{Colors.ORANGE}😈 PoST: {Colors.RESET}")
         if user_move.lower() == 'quit':
             break
 
@@ -139,4 +134,5 @@ if __name__ == "__main__":
         else:
             print("Jogada inválida. Tente novamente.")
 
+    chess_ui.engine.quit()
     sys.exit(app.exec_())
