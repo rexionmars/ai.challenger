@@ -30,53 +30,21 @@ TGP: 95W
 ```lua
 ai.challenger (VOLTS ⚡️)
     |
-    +--- engine/ -- Engines
-    |     |
-    |     +--- Lc0
-    |     +--- stockfish
+    +--- engines/
+    |       |
+    |       +--- weights/
     |
-    +-- performance/inference -- Inferência para a comunicação com as engines.
-    |             |
-    |             +--- main.cpp
-    |             +--- UCIManager.cpp
-    |             +--- UCIManager.h
-    |             +--- chess_program -- binario na arquitetura x86-64 Linux contem a inferencia ao protocolo UCI.
+    +--- performance/inference/
+    |                   |            
+    |                   +--- utils/Utils.py
+    |                   +--- board.svg
+    |                   +--- main.py 
     |
-    +-- UI
-        |
-        +--- config/
-        +--- utils/
-        +--- venv/
-        +--- main.py
+    +--- pyproject.toml
+    +--- README.md
+    +--- requeriments.txt
+    +--- ubuntu_deps.txt
 ```
-<!--
-## Instalção dos algoritmos
-*OBS: make -j12 somente para processadores com 12 nucleos, se o seu tiver menos ou mais nucleos, use conforme o necessario*<br>
-**Instalação do Stockfish 🐟**
-```sh
-git clone https://github.com/official-stockfish/Stockfish.git
-cd Stockfish
-make -j12 profile-build ARCH=x86-64-avx2
-```
-
-**Instalação do Leela Chess Zero Linux ubuntu 😈**
-
-Documentação complete: https://github.com/LeelaChessZero/lc0
-
-Instalar o backend:
-   - Se você deseja usar placas de vídeo NVidia, instale o CUDA e cuDNN.
-   - Se você deseja usar placas de vídeo AMD, instale o OpenCL.
-
-Entre no diretorio lc0/<br>
-Execute ./build.sh<br>
-O binariyo `lc0` (x84_64 Linux) estará no diretório lc0/build/release/<br>
-Descompacte uma rede neural no mesmo diretório do binário. https://lczero.org/play/networks/bestnets/
-
-Se desejar compilar com um compilador diferente, passe as variáveis de ambiente CC e CXX:
-```sh
-CC=clang-6.0 CXX=clang++-6.0 ./build.sh
-```
--->
 ## Avaliação em tempo real da partida
 
 <div align="center">
