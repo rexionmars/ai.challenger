@@ -115,5 +115,3 @@ Email:
   joao_vinicius.carvalho@somosicev.com
   enzo.goncalves@somosicev.com
 ```
-
-![GitHub Contributors Image](https://contrib.rocks/image?repo=rexionmars/volts)
