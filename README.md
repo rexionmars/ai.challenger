@@ -3,7 +3,7 @@
   Este projeto permite a integração de varias engines voltadas para competições de xadrez, contem suporte a interface grafica, estatisticas de jogo, com suporte para CPU e GPU (nvidia series 30), com o protoloco UCI.<br>
   <p><strong>{joao_leonardi.melo, enzo.goncalves, joao_vinicius.carvalho}@somosicev.com</strong></p>
   https://discord.gg/zcZQvRvyyz
-  <img src="Screenshot from 2023-11-26 17-22-26.png">
+  <img src="images/Screenshot from 2023-11-26 17-22-26.png">
 </div>
 
 ## Suporte e hardware utilizado 💻
