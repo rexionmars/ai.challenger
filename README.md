@@ -28,7 +28,7 @@ TGP: 95W
 
 ## Estrutura de pastas do projeto 📂
 ```lua
-ai.challenger (VOLTS ⚡️)
+volts ⚡️
     |
     +--- engines/
     |       |
