@@ -6,13 +6,17 @@ Para executar o jogo, basta executar o comando:
     python main.py
 """
 
-import sys
+import re
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
-from PyQt5.QtSvg import QSvgWidget
+import sys
 import chess
 import chess.svg
 import chess.engine
+import yaml
+from chess.engine import PovScore
+
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PyQt5.QtSvg import QSvgWidget
 
 from utils.Utils import Common, Colors, Logger
 
@@ -22,22 +26,25 @@ class ChessUI(QMainWindow):
     Classe que implementa a interface gráfica do jogo de xadrez.
     """
     SVG_FILENAME = 'board.svg'
-    ENGINE_CONFIG = {"Threads": 12, "Hash": 512}
-    ENGINE_LIMIT = chess.engine.Limit(nodes=1000000, depth=50, time=5.0)
 
-    def __init__(self, engine_path: str, player_color: str) -> None:
+    def __init__(self, engine_path: str, player_color: int, config: dict) -> None:
         """
         Construtor da classe.
         """
         super().__init__()
 
+        self.engine = chess.engine.SimpleEngine.popen_uci(engine_path)
+
+        engine_limit_config = config.get('engine_limit', {})
+        self.engine.configure(config.get('engine_config', {}))
+        self.engine_limit_config = chess.engine.Limit(**engine_limit_config)
+        
         self.engine_path = engine_path
         self.board = chess.Board()
-        self.engine = chess.engine.SimpleEngine.popen_uci(engine_path)
-        self.engine.configure(self.ENGINE_CONFIG)
-        self.player_color = player_color.lower()
+        self.player_color = player_color
 
         self.init_ui()
+
 
     def init_ui(self) -> None:
         """
@@ -53,10 +60,11 @@ class ChessUI(QMainWindow):
         layout.addWidget(self.svg_widget)
 
         self.setGeometry(100, 100, 600, 600)
-        self.setWindowTitle('Chess UI')
+        self.setWindowTitle('Volts ⚡')
 
-        if self.player_color == "pretas":
+        if self.player_color == 0:
             self.suggest_move()
+
 
     def update_board(self) -> None:
         """
@@ -70,15 +78,13 @@ class ChessUI(QMainWindow):
         self.svg_widget.show()
 
     def suggest_move(self) -> None:
-        """
-        Sugere uma jogada para o jogador.
-        """
-        result = self.engine.play(self.board, self.ENGINE_LIMIT)
+        result = self.engine.play(self.board, self.engine_limit_config)
         self.board.push(result.move)
         self.update_board()
 
-        info = self.engine.analyse(self.board, self.ENGINE_LIMIT)
+        info = self.engine.analyse(self.board, self.engine_limit_config)
         self.print_evaluation(info)
+
 
     def check_game_result(self) -> bool:
         """
@@ -106,13 +112,11 @@ class ChessUI(QMainWindow):
         Imprime a avaliação da jogada sugerida pelo motor de xadrez.
         
         """
-        if 'score' in info:
-            print(f"Avaliação: {info['score']}")
-        else:
-            print("Avaliação não disponível.")
+
 
         if 'pv' in info:
             principal_variation = info['pv']
+            print(type(principal_variation))
             print(f"Variação Principal: {principal_variation}")
         else:
             print("Variação Principal não disponível.")
@@ -133,20 +137,37 @@ class ChessUI(QMainWindow):
             print("Tempo de análise não disponível.")
 
         print("\n")
+    
+
+def load_config(filename="config/config.yaml"):
+    try:
+        with open(filename, "r") as config_file:
+            config = yaml.safe_load(config_file)
+        return config
+    except FileNotFoundError:
+        print(f"Arquivo de configuração '{filename}' não encontrado.")
+        return {}
+
 
 if __name__ == "__main__":
     Common.authors()
-    model_path = ""
+    model_path = "/home/remix/wrkdir/my/ai.challenger/engines/Stockfish/src/stockfish"
 
     while True:
-        player_color = input("Escolha a cor das peças (brancas/pretas): ").lower()
-        if player_color in ["brancas", "pretas"]:
+        player_number = input("Escolha a cor das peças 1(⚪) ou 0(⚫)   : ")
+        
+        if player_number.isdigit() and int(player_number) in [0, 1]:
             break
-        else:
-            print("Opção inválida Por favor, escolha entre 'brancas' e 'pretas'.")
+
+        print("Opção inválida. Por favor, escolha entre 0 (⚫) e 1 (⚪).")
+
+    config_filename = "config/config.yaml"
+    config = load_config(config_filename)
+    print(f"Carregando configurações do arquivo '{config}'...")
+
 
     app = QApplication(sys.argv)
-    chess_ui = ChessUI(model_path, player_color)
+    chess_ui = ChessUI(model_path, player_number, config)
     chess_ui.show()
 
     while True:
