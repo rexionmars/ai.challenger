@@ -1,3 +1,11 @@
+"""
+Autores: João Leonardi, Enzo e João Vinícius
+
+Arquivo principal para execução do jogo de xadrez.
+Para executar o jogo, basta executar o comando:
+    python main.py
+"""
+
 import sys
 import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
@@ -6,14 +14,21 @@ import chess
 import chess.svg
 import chess.engine
 
-from utils.Utils import Colors, writelnc
+from utils.Utils import Common, Colors, Logger
+
 
 class ChessUI(QMainWindow):
+    """
+    Classe que implementa a interface gráfica do jogo de xadrez.
+    """
     SVG_FILENAME = 'board.svg'
     ENGINE_CONFIG = {"Threads": 12, "Hash": 512}
     ENGINE_LIMIT = chess.engine.Limit(nodes=1000000, depth=50, time=5.0)
 
-    def __init__(self, engine_path: str, player_color: str):
+    def __init__(self, engine_path: str, player_color: str) -> None:
+        """
+        Construtor da classe.
+        """
         super().__init__()
 
         self.engine_path = engine_path
@@ -24,7 +39,10 @@ class ChessUI(QMainWindow):
 
         self.init_ui()
 
-    def init_ui(self):
+    def init_ui(self) -> None:
+        """
+        Inicializa a interface gráfica.
+        """
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
 
@@ -40,7 +58,10 @@ class ChessUI(QMainWindow):
         if self.player_color == "pretas":
             self.suggest_move()
 
-    def update_board(self):
+    def update_board(self) -> None:
+        """
+        Atualiza o tabuleiro de xadrez.
+        """
         svg_data = chess.svg.board(self.board)
         with open(self.SVG_FILENAME, 'w') as svg_file:
             svg_file.write(svg_data)
@@ -48,7 +69,10 @@ class ChessUI(QMainWindow):
         self.svg_widget.load(self.SVG_FILENAME)
         self.svg_widget.show()
 
-    def suggest_move(self):
+    def suggest_move(self) -> None:
+        """
+        Sugere uma jogada para o jogador.
+        """
         result = self.engine.play(self.board, self.ENGINE_LIMIT)
         self.board.push(result.move)
         self.update_board()
@@ -56,25 +80,32 @@ class ChessUI(QMainWindow):
         info = self.engine.analyse(self.board, self.ENGINE_LIMIT)
         self.print_evaluation(info)
 
-    def check_game_result(self):
+    def check_game_result(self) -> bool:
+        """
+        Verifica se o jogo terminou.
+        """
         if self.board.is_checkmate():
-            print("Xeque-mate! Você perdeu. 💔😢")
+            print("Xeque-mate! Você perdeu 💔😢")
             return True
         elif self.board.is_stalemate():
-            print("Empate! O jogo terminou empatado. 🤝😐")
+            print("Empate! O jogo terminou empatado 🤝😐")
             return True
         elif self.board.is_insufficient_material():
-            print("Empate! Material insuficiente para xeque-mate. 🤝😐")
+            print("Empate! Material insuficiente para xeque-mate 🤝😐")
             return True
         elif self.board.is_seventyfive_moves():
-            print("Empate! O jogo atingiu o limite de 75 movimentos sem capturas ou movimentos de peões. 🤝😐")
+            print("Empate! O jogo atingiu o limite de 75 movimentos sem capturas ou movimentos de peões 🤝😐")
             return True
         elif self.board.is_fivefold_repetition():
-            print("Empate! A posição se repetiu pela quinta vez. 🤝😐")
+            print("Empate! A posição se repetiu pela quinta vez 🤝😐")
             return True
         return False
 
-    def print_evaluation(self, info):
+    def print_evaluation(self, info: dict) -> None:
+        """
+        Imprime a avaliação da jogada sugerida pelo motor de xadrez.
+        
+        """
         if 'score' in info:
             print(f"Avaliação: {info['score']}")
         else:
@@ -104,18 +135,18 @@ class ChessUI(QMainWindow):
         print("\n")
 
 if __name__ == "__main__":
-    print("{joao_leonardi.melo, enzo.goncalves, joao_vinicius.carvalho}@somosicev.com")
-    stockfish_path = "ALGO_PATH"
+    Common.authors()
+    model_path = ""
 
     while True:
         player_color = input("Escolha a cor das peças (brancas/pretas): ").lower()
         if player_color in ["brancas", "pretas"]:
             break
         else:
-            print("Opção inválida. Por favor, escolha entre 'brancas' e 'pretas'.")
+            print("Opção inválida Por favor, escolha entre 'brancas' e 'pretas'.")
 
     app = QApplication(sys.argv)
-    chess_ui = ChessUI(stockfish_path, player_color)
+    chess_ui = ChessUI(model_path, player_color)
     chess_ui.show()
 
     while True:
