@@ -2,3 +2,4 @@ chess
 PyQt5
 art
 black
+pyyaml
