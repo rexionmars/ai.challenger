@@ -1,4 +1,3 @@
-# Códigos de cores ANSI
 class Colors:
     RESET = '\033[0m'
     RED = '\033[91m'
@@ -10,5 +9,23 @@ class Colors:
     WHITE = '\033[97m'
     ORANGE = '\033[38;5;208m'
 
-def writelnc(text: str, color: str) -> None:
-    print(f'{color}{text}{Colors.RESET}')
+
+class Common:
+    def writelnc(text: str, color: str) -> None:
+        """
+        Esta função escreve uma linha de texto com a cor especificada.
+
+        Args:
+            text (str): Texto a ser escrito.
+            color (str): Cor do texto.
+        Returns:
+            None
+        """
+        print(f'{color}{text}{Colors.RESET}')
+    
+    def authors() -> None:
+        print(f'Autores:{Colors.ORANGE}\n\tjoao_leonardi.melo@somosicev.com\n\tjoao_vinicius.carvalho@somosicev.com\n\tenzo.goncalves@somosicev.com{Colors.RESET}')
+
+class Logger:
+    def __init__(self) -> None:
+        pass
