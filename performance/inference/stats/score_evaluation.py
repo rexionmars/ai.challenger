@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.animation import FuncAnimation
+from scipy.interpolate import CubicSpline
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -22,11 +24,21 @@ class MyHandler(FileSystemEventHandler):
 
     def update_plot(self, frame):
         self.load_data()
+
+        x = np.arange(len(self.data))
+        y = np.array(self.data)
+
+        # Criando uma função de spline cúbica
+        spline = CubicSpline(x, y)
+
+        x_interp = np.linspace(0, len(self.data) - 1, 100)
+        y_interp = spline(x_interp)
+
         self.ax.clear()
-        self.ax.plot(self.data[::-1], marker='o', linestyle='-', color='b')  # Invertendo os valores
-        self.ax.set_xlabel('Amostra')
-        self.ax.set_ylabel('Valor')
-        self.ax.set_title('Relação Inversa: Menos Valor, Mais Chances de Perder')
+        self.ax.plot(x_interp, y_interp, linestyle='-', color='r')
+        #self.ax.set_xlabel('Amostra')
+        #self.ax.set_ylabel('Valor')
+        self.ax.set_title('Play rate')
 
 def main(file_path):
     fig, ax = plt.subplots()
