@@ -49,8 +49,8 @@ class MyHandler(FileSystemEventHandler):
 
         self.ax.clear()
         self.ax.plot(x_interp, y_scores_interp, linestyle='-', color='r', label='Scores')
-        self.ax.set_xlabel('Amostra')
-        self.ax.set_ylabel('Score')
+        #self.ax.set_xlabel('Rate +/-')
+        self.ax.set_ylabel('Rate +/-')
         self.ax.legend()
 
         ax2 = self.ax.twinx()
@@ -58,7 +58,7 @@ class MyHandler(FileSystemEventHandler):
         ax2.set_ylabel('Profundidade')
         ax2.legend()
 
-        self.ax.set_title('Curvas Suavizadas de Score e Profundidade')
+        self.ax.set_title('Play rate and depth over time')
 
 def main(score_file_path, depth_file_path):
     fig, ax = plt.subplots(figsize=(12, 6))
