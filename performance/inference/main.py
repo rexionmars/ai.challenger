@@ -5,7 +5,6 @@ Arquivo principal para execução do jogo de xadrez.
 Para executar o jogo, basta executar o comando:
     python main.py
 """
-
 import re
 import os
 import sys
@@ -85,6 +84,7 @@ class ChessUI(QMainWindow):
 
     def suggest_move(self) -> None:
         result = self.engine.play(self.board, self.engine_limit_config)
+        print(f"{Colors.RED}[ENGINE {result.move}]{Colors.RESET}")
         self.board.push(result.move)
         self.update_board()
 
@@ -194,7 +194,7 @@ def play_chess(chess_ui):
 
 def main():
     Common.authors()
-    model_path = "/home/remix/wrkdir/my/ai.challenger/engines/Stockfish/src/stockfish"
+    model_path = ""
 
     while True:
         player_color_input = input("Escolha a cor das peças 1(⚪) ou 0(⚫): ")
