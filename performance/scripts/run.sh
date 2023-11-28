@@ -1,0 +1,1 @@
+python3 -m ../inference/main,py && python3 -m ../inference/stats/score_evaluation.py
