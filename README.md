@@ -44,16 +44,16 @@ volts ⚡️
     +--- requeriments.txt
     +--- ubuntu_deps.txt
 ```
-<!--
+
 ## Avaliação em tempo real da partida
 
 <div align="center">
   <h4>Profundidate x Tempo de Analise</h4>
-  <img src="images/Screenshot from 2023-11-20 10-49-08.png" alt="Snake logo">
+  <img src="images/Screenshot from 2023-11-28 08-53-14.png" alt="Snake logo">
   <h4>Avaliação ao longo do tempo</h4>
-  <img src="images/Screenshot from 2023-11-20 14-46-31.png" alt="Snake logo">
+  <img src="images/Screenshot from 2023-11-28 08-53-26.png" alt="Snake logo">
 </div>
--->
+
 ## Projetos e papers usados como inspiração 📄
 **Papers:**<br>
 Chess AI: Competing Paradigms for Machine Intelligence:
