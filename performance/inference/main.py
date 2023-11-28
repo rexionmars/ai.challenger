@@ -15,6 +15,7 @@ import chess.engine
 import yaml
 import threading
 import time
+import atexit
 
 from chess.engine import PovScore
 
@@ -23,22 +24,11 @@ from PyQt5.QtSvg import QSvgWidget
 
 from utils.Utils import Common, Colors, Logger
 
-import re
-import os
-import sys
-import chess
-import chess.svg
-import chess.engine
-import yaml
-import time
-
-from chess.engine import PovScore
-
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
-from PyQt5.QtSvg import QSvgWidget
 
 class ChessUI(QMainWindow):
     SVG_FILENAME = 'board.svg'
+    SCORES_FILENAME = 'evaluation.txt'
+    DEPTHS_FILENAME = 'depth.txt'
 
     def __init__(self, engine_path: str, player_color: int, config: dict) -> None:
         super().__init__()
@@ -53,8 +43,21 @@ class ChessUI(QMainWindow):
         self.board = chess.Board()
         self.player_color = player_color
         self.scores_history = []
+        self.depths_history = []
+
+        atexit.register(self.cleanup)
 
         self.init_ui()
+
+    def cleanup(self):
+        """
+        Limpa o conteúdo do arquivo de avaliações ao encerrar o programa.
+        """
+        with open(self.SCORES_FILENAME, 'w') as file:
+            file.write('')
+
+        with open(self.DEPTHS_FILENAME, 'w') as file:
+            file.write('')
 
     def init_ui(self) -> None:
         central_widget = QWidget(self)
@@ -89,7 +92,7 @@ class ChessUI(QMainWindow):
         score_value = self.get_score_value(info)
         if score_value is not None:
             self.scores_history.append(score_value)
-            with open('evaluation.txt', 'a') as file:
+            with open(self.SCORES_FILENAME, 'a') as file:
                 file.write(str(score_value) + '\n')
 
         self.print_evaluation(info)
@@ -132,7 +135,12 @@ class ChessUI(QMainWindow):
             print("Variação Principal não disponível.")
 
         if 'depth' in info:
-            print(f"Profundidade: {info['depth']}")
+            depth_value = info['depth']
+            print(f"Profundidade: {depth_value}")
+            self.depths_history.append(depth_value)
+
+            with open('depth.txt', 'a') as depth_file:
+                depth_file.write(f"{depth_value}\n")
         else:
             print("Profundidade não disponível.")
 
