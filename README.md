@@ -52,6 +52,8 @@ volts ⚡️
   <img src="images/Screenshot from 2023-11-28 08-53-14.png" alt="Snake logo">
   <h4>Avaliação ao longo do tempo</h4>
   <img src="images/Screenshot from 2023-11-28 08-53-26.png" alt="Snake logo">
+  <h4>Partida contra outra engine</h4>
+  <img src="images/Screenshot from 2023-11-28 15-12-42.png" alt="Snake logo">
 </div>
 
 ## Projetos e papers usados como inspiração 📄
