@@ -5,50 +5,69 @@ from scipy.interpolate import CubicSpline
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+plt.style.use('dark_background')
+
 class MyHandler(FileSystemEventHandler):
-    def __init__(self, file_path, ax):
+    def __init__(self, score_file_path, depth_file_path, ax):
         super().__init__()
-        self.file_path = file_path
+        self.score_file_path = score_file_path
+        self.depth_file_path = depth_file_path
         self.ax = ax
-        self.data = []
+        self.scores_data = []
+        self.depths_data = []
 
     def on_modified(self, event):
-        if event.src_path == self.file_path:
+        if event.src_path == self.score_file_path or event.src_path == self.depth_file_path:
             self.load_data()
             self.update_plot()
 
     def load_data(self):
-        with open(self.file_path, 'r') as file:
-            lines = file.read().splitlines()
-            self.data = [int(line) for line in lines]
+        with open(self.score_file_path, 'r') as score_file:
+            score_lines = score_file.read().splitlines()
+            self.scores_data.clear()
+            self.scores_data.extend([int(line) for line in score_lines])
+
+        with open(self.depth_file_path, 'r') as depth_file:
+            depth_lines = depth_file.read().splitlines()
+            self.depths_data.clear()
+            self.depths_data.extend([int(line) for line in depth_lines])
 
     def update_plot(self, frame):
         self.load_data()
 
-        x = np.arange(len(self.data))
-        y = np.array(self.data)
+        min_samples = min(len(self.scores_data), len(self.depths_data))
+        x = np.arange(min_samples)
+        y_scores = np.array(self.scores_data[:min_samples])
+        y_depths = np.array(self.depths_data[:min_samples])
 
-        # Criando uma função de spline cúbica
-        spline = CubicSpline(x, y)
+        spline_scores = CubicSpline(x, y_scores)
+        spline_depths = np.poly1d(np.polyfit(x, y_depths, 1))  # Usando interpolação linear
 
-        x_interp = np.linspace(0, len(self.data) - 1, 100)
-        y_interp = spline(x_interp)
+        x_interp = np.linspace(0, min_samples - 1, 100)
+        y_scores_interp = spline_scores(x_interp)
+        y_depths_interp = spline_depths(x_interp)
 
         self.ax.clear()
-        self.ax.plot(x_interp, y_interp, linestyle='-', color='r')
-        #self.ax.set_xlabel('Amostra')
-        #self.ax.set_ylabel('Valor')
-        self.ax.set_title('Play rate')
+        self.ax.plot(x_interp, y_scores_interp, linestyle='-', color='r', label='Scores')
+        self.ax.set_xlabel('Amostra')
+        self.ax.set_ylabel('Score')
+        self.ax.legend()
 
-def main(file_path):
-    fig, ax = plt.subplots()
-    handler = MyHandler(file_path, ax)
+        ax2 = self.ax.twinx()
+        ax2.plot(x_interp, y_depths_interp, linestyle='-', color='b', label='Depth')
+        ax2.set_ylabel('Profundidade')
+        ax2.legend()
+
+        self.ax.set_title('Curvas Suavizadas de Score e Profundidade')
+
+def main(score_file_path, depth_file_path):
+    fig, ax = plt.subplots(figsize=(12, 6))
+    handler = MyHandler(score_file_path, depth_file_path, ax)
     observer = Observer()
     observer.schedule(handler, path='.', recursive=False)
     observer.start()
 
     ani = FuncAnimation(fig, handler.update_plot, blit=False, interval=1000)
-
     plt.show()
 
     try:
@@ -60,5 +79,6 @@ def main(file_path):
     observer.join()
 
 if __name__ == "__main__":
-    file_path = '../evaluation.txt'
-    main(file_path)
+    score_file_path = '../evaluation.txt'
+    depth_file_path = '../depth.txt'
+    main(score_file_path, depth_file_path)
