@@ -1,4 +1,6 @@
 engines/Stockfish/*
 performance/inference/*.out
 performance/inference/board.svg
+performance/inference/*.txt
+
 venv
