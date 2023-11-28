@@ -13,6 +13,9 @@ import chess
 import chess.svg
 import chess.engine
 import yaml
+import threading
+import time
+
 from chess.engine import PovScore
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
@@ -20,17 +23,24 @@ from PyQt5.QtSvg import QSvgWidget
 
 from utils.Utils import Common, Colors, Logger
 
+import re
+import os
+import sys
+import chess
+import chess.svg
+import chess.engine
+import yaml
+import time
+
+from chess.engine import PovScore
+
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PyQt5.QtSvg import QSvgWidget
 
 class ChessUI(QMainWindow):
-    """
-    Classe que implementa a interface gráfica do jogo de xadrez.
-    """
     SVG_FILENAME = 'board.svg'
 
     def __init__(self, engine_path: str, player_color: int, config: dict) -> None:
-        """
-        Construtor da classe.
-        """
         super().__init__()
 
         self.engine = chess.engine.SimpleEngine.popen_uci(engine_path)
@@ -38,18 +48,15 @@ class ChessUI(QMainWindow):
         engine_limit_config = config.get('engine_limit', {})
         self.engine.configure(config.get('engine_config', {}))
         self.engine_limit_config = chess.engine.Limit(**engine_limit_config)
-        
+
         self.engine_path = engine_path
         self.board = chess.Board()
         self.player_color = player_color
+        self.scores_history = []
 
         self.init_ui()
 
-
     def init_ui(self) -> None:
-        """
-        Inicializa a interface gráfica.
-        """
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
 
@@ -65,11 +72,7 @@ class ChessUI(QMainWindow):
         if self.player_color == 0:
             self.suggest_move()
 
-
     def update_board(self) -> None:
-        """
-        Atualiza o tabuleiro de xadrez.
-        """
         svg_data = chess.svg.board(self.board)
         with open(self.SVG_FILENAME, 'w') as svg_file:
             svg_file.write(svg_data)
@@ -83,13 +86,15 @@ class ChessUI(QMainWindow):
         self.update_board()
 
         info = self.engine.analyse(self.board, self.engine_limit_config)
+        score_value = self.get_score_value(info)
+        if score_value is not None:
+            self.scores_history.append(score_value)
+            with open('evaluation.txt', 'a') as file:
+                file.write(str(score_value) + '\n')
+
         self.print_evaluation(info)
 
-
     def check_game_result(self) -> bool:
-        """
-        Verifica se o jogo terminou.
-        """
         if self.board.is_checkmate():
             print("Xeque-mate! Você perdeu 💔😢")
             return True
@@ -108,16 +113,21 @@ class ChessUI(QMainWindow):
         return False
 
     def print_evaluation(self, info: dict) -> None:
-        """
-        Imprime a avaliação da jogada sugerida pelo motor de xadrez.
-        
-        """
+        if 'score' in info and isinstance(info['score'], PovScore):
+            score_text = str(info['score'])
+            match = re.search(r'\((-?\d+)\)', score_text)
 
+            if match:
+                score_value = int(match.group(1))
+                print(f"Avaliação: {score_value}")
+                self.scores_history.append(score_value)
+            else:
+                print("Avaliação não disponível.")
+        else:
+            print("Avaliação não disponível.")
 
         if 'pv' in info:
-            principal_variation = info['pv']
-            print(type(principal_variation))
-            print(f"Variação Principal: {principal_variation}")
+            print(f"Variação Principal: {info['pv']}")
         else:
             print("Variação Principal não disponível.")
 
@@ -137,7 +147,15 @@ class ChessUI(QMainWindow):
             print("Tempo de análise não disponível.")
 
         print("\n")
-    
+
+    def get_score_value(self, info):
+        if 'score' in info and isinstance(info['score'], PovScore):
+            score_text = str(info['score'])
+            match = re.search(r'\((-?\d+)\)', score_text)
+
+            if match:
+                return int(match.group(1))
+        return None
 
 def load_config(filename="config/config.yaml"):
     try:
@@ -148,28 +166,7 @@ def load_config(filename="config/config.yaml"):
         print(f"Arquivo de configuração '{filename}' não encontrado.")
         return {}
 
-
-if __name__ == "__main__":
-    Common.authors()
-    model_path = "/home/remix/wrkdir/my/ai.challenger/engines/Stockfish/src/stockfish"
-
-    while True:
-        player_number = input("Escolha a cor das peças 1(⚪) ou 0(⚫)   : ")
-        
-        if player_number.isdigit() and int(player_number) in [0, 1]:
-            break
-
-        print("Opção inválida. Por favor, escolha entre 0 (⚫) e 1 (⚪).")
-
-    config_filename = "config/config.yaml"
-    config = load_config(config_filename)
-    print(f"Carregando configurações do arquivo '{config}'...")
-
-
-    app = QApplication(sys.argv)
-    chess_ui = ChessUI(model_path, player_number, config)
-    chess_ui.show()
-
+def play_chess(chess_ui):
     while True:
         user_move = input(f"{Colors.ORANGE}😈 PoST: {Colors.RESET}")
         if user_move.lower() == 'quit':
@@ -181,10 +178,35 @@ if __name__ == "__main__":
             if chess_ui.check_game_result():
                 break
             chess_ui.suggest_move()
+
             if chess_ui.check_game_result():
                 break
         else:
             print("Jogada inválida. Tente novamente.")
 
+def main():
+    Common.authors()
+    model_path = "/home/remix/wrkdir/my/ai.challenger/engines/Stockfish/src/stockfish"
+
+    while True:
+        player_number = input("Escolha a cor das peças 1(⚪) ou 0(⚫)   : ")
+
+        if player_number.isdigit() and int(player_number) in [0, 1]:
+            break
+
+        print("Opção inválida. Por favor, escolha entre 0 (⚫) e 1 (⚪).")
+
+    config_filename = "config/config.yaml"
+    config = load_config(config_filename)
+
+    app = QApplication(sys.argv)
+    chess_ui = ChessUI(model_path, player_number, config)
+    chess_ui.show()
+
+    play_chess(chess_ui)
+
     chess_ui.engine.quit()
     sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()
