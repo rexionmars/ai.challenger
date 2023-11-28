@@ -197,21 +197,40 @@ def main():
     model_path = "/home/remix/wrkdir/my/ai.challenger/engines/Stockfish/src/stockfish"
 
     while True:
-        player_number = input("Escolha a cor das peças 1(⚪) ou 0(⚫)   : ")
-
-        if player_number.isdigit() and int(player_number) in [0, 1]:
+        player_color_input = input("Escolha a cor das peças 1(⚪) ou 0(⚫): ")
+        if player_color_input.isdigit() and int(player_color_input) in [0, 1]:
             break
-
         print("Opção inválida. Por favor, escolha entre 0 (⚫) e 1 (⚪).")
+
+    player_color = int(player_color_input)
 
     config_filename = "config/config.yaml"
     config = load_config(config_filename)
 
     app = QApplication(sys.argv)
-    chess_ui = ChessUI(model_path, player_number, config)
+    chess_ui = ChessUI(model_path, player_color, config)
     chess_ui.show()
 
-    play_chess(chess_ui)
+    if player_color == 0:
+        play_chess(chess_ui)
+    else:
+        while True:
+            chess_ui.suggest_move()
+            if chess_ui.check_game_result():
+                break
+
+            user_move = input(f"{Colors.ORANGE}😈 PoST: {Colors.RESET}")
+            if user_move.lower() == 'quit':
+                break
+
+            if chess.Move.from_uci(user_move) in chess_ui.board.legal_moves:
+                chess_ui.board.push(chess.Move.from_uci(user_move))
+                chess_ui.update_board()
+
+                if chess_ui.check_game_result():
+                    break
+            else:
+                print("Jogada inválida. Tente novamente.")
 
     chess_ui.engine.quit()
     sys.exit(app.exec_())
