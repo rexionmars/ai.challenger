@@ -74,8 +74,6 @@ https://github.com/rexionmars/ctorch
 
 # Autores
 ```lua
---- Departamento de Engenharia de Software
---- iCev Instituto de Ensino Superior
 
 João Leonardi da Silva Melo
 João Vinícius Castelo branco
