@@ -1,0 +1,231 @@
+import re
+import os
+import sys
+import chess
+import chess.svg
+import chess.engine
+import yaml
+import threading
+import time
+import atexit
+import subprocess
+
+from chess.engine import PovScore
+
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PyQt5.QtSvg import QSvgWidget
+
+class ChessUI(QMainWindow):
+    SVG_FILENAME = 'board.svg'
+    SCORES_FILENAME = 'evaluation.txt'
+    DEPTHS_FILENAME = 'depth.txt'
+
+    def __init__(self, engine_path: str, player_color: int, config: dict) -> None:
+        super().__init__()
+
+        self.engine = chess.engine.SimpleEngine.popen_uci(engine_path)
+
+        engine_limit_config = config.get('engine_limit', {})
+        self.engine.configure(config.get('engine_config', {}))
+        self.engine_limit_config = chess.engine.Limit(**engine_limit_config)
+
+        self.engine_path = engine_path
+        self.board = chess.Board()
+        self.player_color = player_color
+        self.scores_history = []
+        self.depths_history = []
+
+        atexit.register(self.cleanup)
+
+        self.init_ui()
+
+    def cleanup(self):
+        with open(self.SCORES_FILENAME, 'w') as file:
+            file.write('')
+
+        with open(self.DEPTHS_FILENAME, 'w') as file:
+            file.write('')
+
+    def init_ui(self) -> None:
+        central_widget = QWidget(self)
+        self.setCentralWidget(central_widget)
+
+        layout = QVBoxLayout(central_widget)
+
+        self.svg_widget = QSvgWidget(self)
+        self.update_board()
+        layout.addWidget(self.svg_widget)
+
+        self.setGeometry(100, 100, 600, 600)
+        self.setWindowTitle('Volts ⚡')
+
+        if self.player_color == 0:
+            self.suggest_move()
+
+    def update_board(self) -> None:
+        svg_data = chess.svg.board(self.board)
+        with open(self.SVG_FILENAME, 'w') as svg_file:
+            svg_file.write(svg_data)
+
+        self.svg_widget.load(self.SVG_FILENAME)
+        self.svg_widget.show()
+
+    def suggest_move(self) -> None:
+        lc0_command = [
+            self.engine_path,
+            "--output-dir",
+            ".",
+            "--mode",
+            "uci"
+        ]
+
+        lc0_process = subprocess.run(
+            lc0_command,
+            input=f"position fen {self.board.fen()}\ngo\n",
+            text=True,
+            capture_output=True
+        )
+
+        lc0_output = lc0_process.stdout
+        lc0_best_move = re.search(r'bestmove (\S+)', lc0_output)
+
+        if lc0_best_move:
+            best_move_uci = lc0_best_move.group(1)
+            move = chess.Move.from_uci(best_move_uci)
+            print(f"[ENGINE {move}]")
+            self.board.push(move)
+            self.update_board()
+
+            info = self.engine.analyse(self.board, self.engine_limit_config)
+            self.print_evaluation(info)
+
+    def check_game_result(self) -> bool:
+        if self.board.is_checkmate():
+            print("Xeque-mate! Você perdeu 💔😢")
+            return True
+        elif self.board.is_stalemate():
+            print("Empate! O jogo terminou empatado 🤝😐")
+            return True
+        elif self.board.is_insufficient_material():
+            print("Empate! Material insuficiente para xeque-mate 🤝😐")
+            return True
+        elif self.board.is_seventyfive_moves():
+            print("Empate! O jogo atingiu o limite de 75 movimentos sem capturas ou movimentos de peões 🤝😐")
+            return True
+        elif self.board.is_fivefold_repetition():
+            print("Empate! A posição se repetiu pela quinta vez 🤝😐")
+            return True
+        return False
+
+    def print_evaluation(self, info: dict) -> None:
+        if 'score' in info and isinstance(info['score'], PovScore):
+            score_text = str(info['score'])
+            match = re.search(r'\((-?\d+)\)', score_text)
+
+            if match:
+                score_value = int(match.group(1))
+                print(f"Avaliação: {score_value}")
+                self.scores_history.append(score_value)
+            else:
+                print("Avaliação não disponível.")
+        else:
+            print("Avaliação não disponível.")
+
+        if 'pv' in info:
+            print(f"Variação Principal: {info['pv']}")
+        else:
+            print("Variação Principal não disponível.")
+
+        if 'depth' in info:
+            depth_value = info['depth']
+            print(f"Profundidade: {depth_value}")
+            self.depths_history.append(depth_value)
+
+            with open('depth.txt', 'a') as depth_file:
+                depth_file.write(f"{depth_value}\n")
+        else:
+            print("Profundidade não disponível.")
+
+        if 'nodes' in info:
+            print(f"Nós analisados: {info['nodes']}")
+        else:
+            print("Nós analisados não disponíveis.")
+
+        if 'time' in info:
+            print(f"Tempo de análise: {info['time']} segundos")
+        else:
+            print("Tempo de análise não disponível.")
+
+        print("\n")
+
+def load_config(filename="config/config.yaml"):
+    try:
+        with open(filename, "r") as config_file:
+            config = yaml.safe_load(config_file)
+        return config
+    except FileNotFoundError:
+        print(f"Arquivo de configuração '{filename}' não encontrado.")
+        return {}
+
+def play_chess(chess_ui):
+    while True:
+        user_move = input(f"😈 PoST: ")
+        if user_move.lower() == 'quit':
+            break
+
+        if chess.Move.from_uci(user_move) in chess_ui.board.legal_moves:
+            chess_ui.board.push(chess.Move.from_uci(user_move))
+            chess_ui.update_board()
+            if chess_ui.check_game_result():
+                break
+            chess_ui.suggest_move()
+
+            if chess_ui.check_game_result():
+                break
+        else:
+            print("Jogada inválida. Tente novamente.")
+
+def main():
+    model_path = "caminho/para/seu/lc0"  # Substitua pelo caminho real para o seu LCZero
+
+    while True:
+        player_color_input = input("Escolha a cor das peças 1(⚪) ou 0(⚫): ")
+        if player_color_input.isdigit() and int(player_color_input) in [0, 1]:
+            break
+        print("Opção inválida. Por favor, escolha entre 0 (⚫) e 1 (⚪).")
+
+    player_color = int(player_color_input)
+
+    config_filename = "config/config.yaml"
+    config = load_config(config_filename)
+
+    app = QApplication(sys.argv)
+    chess_ui = ChessUI(model_path, player_color, config)
+    chess_ui.show()
+
+    if player_color == 0:
+        play_chess(chess_ui)
+    else:
+        while True:
+            chess_ui.suggest_move()
+            if chess_ui.check_game_result():
+                break
+
+            user_move = input("😈 PoST: ")
+            if user_move.lower() == 'quit':
+                break
+
+            if chess.Move.from_uci(user_move) in chess_ui.board.legal_moves:
+                chess_ui.board.push(chess.Move.from_uci(user_move))
+                chess_ui.update_board()
+
+                if chess_ui.check_game_result():
+                    break
+            else:
+                print("Jogada inválida. Tente novamente.")
+
+    chess_ui.engine.quit()
+    sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()
