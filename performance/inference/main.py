@@ -204,6 +204,17 @@ def play_chess(chess_ui):
         else:
             print("Jogada inválida. Tente novamente.")
 
+def wait_for_opponent_move(chess_ui):
+    while True:
+        opponent_move = input(f"{Colors.BLUE}🤖 Oponente: {Colors.RESET}")
+        if validate_input_from_re(opponent_move):
+            if chess.Move.from_uci(opponent_move) in chess_ui.board.legal_moves:
+                chess_ui.board.push(chess.Move.from_uci(opponent_move))
+                chess_ui.update_board()
+                break
+            else:
+                print("Jogada do oponente inválida. Tente novamente.")
+
 
 
 def main():
@@ -211,10 +222,10 @@ def main():
     model_path = "/home/remix/wrkdir/my/ai.challenger/engines/Stockfish/src/stockfish"
 
     while True:
-        player_color_input = input("Escolha a cor das peças 1(⚪) ou 0(⚫): ")
+        player_color_input = input("Escolha a cor das peças 0(⚪) ou 1(⚫): ")
         if player_color_input.isdigit() and int(player_color_input) in [0, 1]:
             break
-        print("Opção inválida. Por favor, escolha entre 0 (⚫) e 1 (⚪).")
+        print("Opção inválida. Por favor, escolha entre 1(⚫) e 0(⚪).")
 
     player_color = int(player_color_input)
 
@@ -228,6 +239,7 @@ def main():
     if player_color == 0:
         play_chess(chess_ui)
     else:
+        wait_for_opponent_move(chess_ui)
         chess_ui.suggest_move()
         play_chess(chess_ui)
 
