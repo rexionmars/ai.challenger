@@ -1,10 +1,3 @@
-"""
-Autores: João Leonardi, Enzo e João Vinícius
-
-Arquivo principal para execução do jogo de xadrez.
-Para executar o jogo, basta executar o comando:
-    python main.py
-"""
 import re
 import os
 import sys
@@ -15,14 +8,12 @@ import yaml
 import threading
 import time
 import atexit
+import subprocess
 
 from chess.engine import PovScore
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtSvg import QSvgWidget
-
-from utils.Utils import Common, Colors, Logger
-
 
 class ChessUI(QMainWindow):
     SVG_FILENAME = 'board.svg'
@@ -49,9 +40,6 @@ class ChessUI(QMainWindow):
         self.init_ui()
 
     def cleanup(self):
-        """
-        Limpa o conteúdo do arquivo de avaliações ao encerrar o programa.
-        """
         with open(self.SCORES_FILENAME, 'w') as file:
             file.write('')
 
@@ -83,19 +71,33 @@ class ChessUI(QMainWindow):
         self.svg_widget.show()
 
     def suggest_move(self) -> None:
-        result = self.engine.play(self.board, self.engine_limit_config)
-        print(f"{Colors.RED}[ENGINE {result.move}]{Colors.RESET}")
-        self.board.push(result.move)
-        self.update_board()
+        lc0_command = [
+            self.engine_path,
+            "--output-dir",
+            ".",
+            "--mode",
+            "uci"
+        ]
 
-        info = self.engine.analyse(self.board, self.engine_limit_config)
-        score_value = self.get_score_value(info)
-        if score_value is not None:
-            self.scores_history.append(score_value)
-            with open(self.SCORES_FILENAME, 'a') as file:
-                file.write(str(score_value) + '\n')
+        lc0_process = subprocess.run(
+            lc0_command,
+            input=f"position fen {self.board.fen()}\ngo\n",
+            text=True,
+            capture_output=True
+        )
 
-        self.print_evaluation(info)
+        lc0_output = lc0_process.stdout
+        lc0_best_move = re.search(r'bestmove (\S+)', lc0_output)
+
+        if lc0_best_move:
+            best_move_uci = lc0_best_move.group(1)
+            move = chess.Move.from_uci(best_move_uci)
+            print(f"[ENGINE {move}]")
+            self.board.push(move)
+            self.update_board()
+
+            info = self.engine.analyse(self.board, self.engine_limit_config)
+            self.print_evaluation(info)
 
     def check_game_result(self) -> bool:
         if self.board.is_checkmate():
@@ -156,15 +158,6 @@ class ChessUI(QMainWindow):
 
         print("\n")
 
-    def get_score_value(self, info):
-        if 'score' in info and isinstance(info['score'], PovScore):
-            score_text = str(info['score'])
-            match = re.search(r'\((-?\d+)\)', score_text)
-
-            if match:
-                return int(match.group(1))
-        return None
-
 def load_config(filename="config/config.yaml"):
     try:
         with open(filename, "r") as config_file:
@@ -174,58 +167,32 @@ def load_config(filename="config/config.yaml"):
         print(f"Arquivo de configuração '{filename}' não encontrado.")
         return {}
 
-def validate_input_from_re(user_input: str) -> bool:
-    # Define um padrão regex para validar a entrada no formato "d7c7".
-    padrao_regex = re.compile(r'^[a-h][1-8][a-h][1-8]$')
-
-    # Verifica se a entrada corresponde ao padrão.
-    if padrao_regex.match(user_input):
-        return True
-    else:
-        print("Formato inválido. Digite no formato correto, por exemplo, 'd7c7'.")
-        return False
-
 def play_chess(chess_ui):
     while True:
-        user_move = input(f"{Colors.ORANGE}😈 PoST: {Colors.RESET}")
-        if not validate_input_from_re(user_move):
-            # Se a entrada não for válida, pule para a próxima iteração do loop.
-            continue
+        user_move = input(f"😈 PoST: ")
+        if user_move.lower() == 'quit':
+            break
 
         if chess.Move.from_uci(user_move) in chess_ui.board.legal_moves:
             chess_ui.board.push(chess.Move.from_uci(user_move))
             chess_ui.update_board()
             if chess_ui.check_game_result():
                 break
-
             chess_ui.suggest_move()
+
             if chess_ui.check_game_result():
                 break
         else:
             print("Jogada inválida. Tente novamente.")
 
-def wait_for_opponent_move(chess_ui):
-    while True:
-        opponent_move = input(f"{Colors.BLUE}🤖 Oponente: {Colors.RESET}")
-        if validate_input_from_re(opponent_move):
-            if chess.Move.from_uci(opponent_move) in chess_ui.board.legal_moves:
-                chess_ui.board.push(chess.Move.from_uci(opponent_move))
-                chess_ui.update_board()
-                break
-            else:
-                print("Jogada do oponente inválida. Tente novamente.")
-
-
-
 def main():
-    Common.authors()
-    model_path = "/home/remix/wrkdir/my/ai.challenger/engines/Stockfish/src/stockfish"
+    model_path = "caminho/para/seu/lc0"  # Substitua pelo caminho real para o seu LCZero
 
     while True:
-        player_color_input = input("Escolha a cor das peças 0(⚪) ou 1(⚫): ")
+        player_color_input = input("Escolha a cor das peças 1(⚪) ou 0(⚫): ")
         if player_color_input.isdigit() and int(player_color_input) in [0, 1]:
             break
-        print("Opção inválida. Por favor, escolha entre 1(⚫) e 0(⚪).")
+        print("Opção inválida. Por favor, escolha entre 0 (⚫) e 1 (⚪).")
 
     player_color = int(player_color_input)
 
@@ -239,9 +206,23 @@ def main():
     if player_color == 0:
         play_chess(chess_ui)
     else:
-        wait_for_opponent_move(chess_ui)
-        chess_ui.suggest_move()
-        play_chess(chess_ui)
+        while True:
+            chess_ui.suggest_move()
+            if chess_ui.check_game_result():
+                break
+
+            user_move = input("😈 PoST: ")
+            if user_move.lower() == 'quit':
+                break
+
+            if chess.Move.from_uci(user_move) in chess_ui.board.legal_moves:
+                chess_ui.board.push(chess.Move.from_uci(user_move))
+                chess_ui.update_board()
+
+                if chess_ui.check_game_result():
+                    break
+            else:
+                print("Jogada inválida. Tente novamente.")
 
     chess_ui.engine.quit()
     sys.exit(app.exec_())

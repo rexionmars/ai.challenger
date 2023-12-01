@@ -1,0 +1,7 @@
+engine_config:
+  threads: 12
+  hash: 8192
+engine_limit:
+  nodes: 1000000
+  depth: 1000000
+  time: 10
