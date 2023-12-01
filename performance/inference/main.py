@@ -185,8 +185,8 @@ def play_chess(chess_ui):
             chess_ui.update_board()
             if chess_ui.check_game_result():
                 break
-            chess_ui.suggest_move()
 
+            chess_ui.suggest_move()
             if chess_ui.check_game_result():
                 break
         else:
@@ -194,7 +194,7 @@ def play_chess(chess_ui):
 
 def main():
     Common.authors()
-    model_path = ""
+    model_path = "/home/remix/wrkdir/my/ai.challenger/engines/Stockfish/src/stockfish"
 
     while True:
         player_color_input = input("Escolha a cor das peças 1(⚪) ou 0(⚫): ")
@@ -214,23 +214,8 @@ def main():
     if player_color == 0:
         play_chess(chess_ui)
     else:
-        while True:
-            chess_ui.suggest_move()
-            if chess_ui.check_game_result():
-                break
-
-            user_move = input(f"{Colors.ORANGE}😈 PoST: {Colors.RESET}")
-            if user_move.lower() == 'quit':
-                break
-
-            if chess.Move.from_uci(user_move) in chess_ui.board.legal_moves:
-                chess_ui.board.push(chess.Move.from_uci(user_move))
-                chess_ui.update_board()
-
-                if chess_ui.check_game_result():
-                    break
-            else:
-                print("Jogada inválida. Tente novamente.")
+        chess_ui.suggest_move()
+        play_chess(chess_ui)
 
     chess_ui.engine.quit()
     sys.exit(app.exec_())
