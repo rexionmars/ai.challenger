@@ -174,11 +174,23 @@ def load_config(filename="config/config.yaml"):
         print(f"Arquivo de configuração '{filename}' não encontrado.")
         return {}
 
+def validate_input_from_re(user_input: str) -> bool:
+    # Define um padrão regex para validar a entrada no formato "d7c7".
+    padrao_regex = re.compile(r'^[a-h][1-8][a-h][1-8]$')
+
+    # Verifica se a entrada corresponde ao padrão.
+    if padrao_regex.match(user_input):
+        return True
+    else:
+        print("Formato inválido. Digite no formato correto, por exemplo, 'd7c7'.")
+        return False
+
 def play_chess(chess_ui):
     while True:
         user_move = input(f"{Colors.ORANGE}😈 PoST: {Colors.RESET}")
-        if user_move.lower() == 'quit':
-            break
+        if not validate_input_from_re(user_move):
+            # Se a entrada não for válida, pule para a próxima iteração do loop.
+            continue
 
         if chess.Move.from_uci(user_move) in chess_ui.board.legal_moves:
             chess_ui.board.push(chess.Move.from_uci(user_move))
@@ -191,6 +203,8 @@ def play_chess(chess_ui):
                 break
         else:
             print("Jogada inválida. Tente novamente.")
+
+
 
 def main():
     Common.authors()
