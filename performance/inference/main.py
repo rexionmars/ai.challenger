@@ -165,6 +165,7 @@ class ChessUI(QMainWindow):
                 return int(match.group(1))
         return None
 
+
 def load_config(filename="config/config.yaml"):
     try:
         with open(filename, "r") as config_file:
@@ -173,6 +174,7 @@ def load_config(filename="config/config.yaml"):
     except FileNotFoundError:
         print(f"Arquivo de configuração '{filename}' não encontrado.")
         return {}
+
 
 def validate_input_from_re(user_input: str) -> bool:
     # Define um padrão regex para validar a entrada no formato "d7c7".
@@ -185,11 +187,12 @@ def validate_input_from_re(user_input: str) -> bool:
         print("Formato inválido. Digite no formato correto, por exemplo, 'd7c7'.")
         return False
 
+
 def play_chess(chess_ui):
     while True:
         user_move = input(f"{Colors.ORANGE}👿️ PoST: {Colors.RESET}")
         if not validate_input_from_re(user_move):
-            # Se a entrada não for válida, pule para a próxima iteração do loop.
+            # Se a entrada for inválida, pule para a próxima iteração do loop.
             continue
 
         if chess.Move.from_uci(user_move) in chess_ui.board.legal_moves:
@@ -204,6 +207,7 @@ def play_chess(chess_ui):
         else:
             print("Jogada inválida. Tente novamente.")
 
+
 def wait_for_opponent_move(chess_ui):
     while True:
         opponent_move = input(f"{Colors.BLUE}🤖 Oponente: {Colors.RESET}")
@@ -216,16 +220,15 @@ def wait_for_opponent_move(chess_ui):
                 print("Jogada do oponente inválida. Tente novamente.")
 
 
-
 def main():
     Common.authors()
-    model_path = "/home/remix/wrkdir/my/ai.challenger/engines/Stockfish/src/stockfish"
+    model_path = "/home/bangoim/Documents/GitHub/Stockfish/src/stockfish"
 
     while True:
-        player_color_input = input("Escolha a cor das peças 0(⚪) ou 1(⚫): ")
+        player_color_input = input("Escolha a cor das peças 0 (Brancas) ou 1 (Pretas): ")
         if player_color_input.isdigit() and int(player_color_input) in [0, 1]:
             break
-        print("Opção inválida. Por favor, escolha entre 1(⚫) e 0(⚪).")
+        print("Opção inválida. Por favor, escolha entre 0 (Brancas) ou 1 (Pretas).")
 
     player_color = int(player_color_input)
 
@@ -245,6 +248,7 @@ def main():
 
     chess_ui.engine.quit()
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()
