@@ -1,5 +1,5 @@
 engine_config:
-  threads: 12
+  threads: 4
   hash: 8192
 engine_limit:
   nodes: 1000000
