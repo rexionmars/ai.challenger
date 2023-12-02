@@ -4,3 +4,5 @@ performance/inference/board.svg
 performance/inference/*.txt
 
 venv
+*.xml
+*.iml
