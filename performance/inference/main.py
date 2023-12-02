@@ -69,7 +69,7 @@ class ChessUI(QMainWindow):
         layout.addWidget(self.svg_widget)
 
         self.setGeometry(100, 100, 600, 600)
-        self.setWindowTitle('Volts ⚡')
+        self.setWindowTitle('Volts ⚡️')
 
         if self.player_color == 0:
             self.suggest_move()
@@ -99,19 +99,19 @@ class ChessUI(QMainWindow):
 
     def check_game_result(self) -> bool:
         if self.board.is_checkmate():
-            print("Xeque-mate! Você perdeu 💔😢")
+            print("Xeque-mate! Você perdeu 💔️😭️")
             return True
         elif self.board.is_stalemate():
-            print("Empate! O jogo terminou empatado 🤝😐")
+            print("Empate! O jogo terminou empatado 🤝️😐️")
             return True
         elif self.board.is_insufficient_material():
-            print("Empate! Material insuficiente para xeque-mate 🤝😐")
+            print("Empate! Material insuficiente para xeque-mate 🤝️🫥️")
             return True
         elif self.board.is_seventyfive_moves():
-            print("Empate! O jogo atingiu o limite de 75 movimentos sem capturas ou movimentos de peões 🤝😐")
+            print("Empate! O jogo atingiu o limite de 75 movimentos sem capturas ou movimentos de peões 🤝️🫠️")
             return True
         elif self.board.is_fivefold_repetition():
-            print("Empate! A posição se repetiu pela quinta vez 🤝😐")
+            print("Empate! A posição se repetiu pela quinta vez 🤝️🤨️")
             return True
         return False
 
@@ -187,7 +187,7 @@ def validate_input_from_re(user_input: str) -> bool:
 
 def play_chess(chess_ui):
     while True:
-        user_move = input(f"{Colors.ORANGE}😈 PoST: {Colors.RESET}")
+        user_move = input(f"{Colors.ORANGE}👿️ PoST: {Colors.RESET}")
         if not validate_input_from_re(user_move):
             # Se a entrada não for válida, pule para a próxima iteração do loop.
             continue
