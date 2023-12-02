@@ -76,7 +76,7 @@ https://github.com/rexionmars/ctorch
 ```lua
 
 João Leonardi da Silva Melo
-João Vinícius Castelo branco
+João Vinícius Passos Castello Branco Carvalho
 Enzo Morais Gonçalves
 Email:
   joao_leonardi.melo@somosicev.com
