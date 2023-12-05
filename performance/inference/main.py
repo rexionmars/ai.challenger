@@ -6,14 +6,11 @@ Para executar o jogo, basta executar o comando:
     python main.py
 """
 import re
-import os
 import sys
 import chess
 import chess.svg
 import chess.engine
 import yaml
-import threading
-import time
 import atexit
 
 from chess.engine import PovScore
@@ -21,7 +18,7 @@ from chess.engine import PovScore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtSvg import QSvgWidget
 
-from utils.Utils import Common, Colors, Logger
+from utils.Utils import Common, Colors
 
 
 class ChessUI(QMainWindow):
