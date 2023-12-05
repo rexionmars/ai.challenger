@@ -99,8 +99,17 @@ class ChessUI(QMainWindow):
 
     def check_game_result(self) -> bool:
         if self.board.is_checkmate():
-            print("Xeque-mate! Você perdeu 💔️😭️")
-            return True
+            # Se for a vez das brancas jogar, e estivermos com as brancas, perdemos
+            if self.board.turn and self.player_color == 0:
+                print("Xeque-mate! Fomos de Americanas 💔️😭️")
+                return True
+            # Se for a vez das pretas jogar, e estivermos com as pretas, perdemos
+            elif not self.board.turn and self.player_color == 1:
+                print("Xeque-mate! FAZ O L 💔️😭️")
+                return True
+            else:
+                print("Xeque-mate! TACA O PAU 🏆️🎉️")
+                return True
         elif self.board.is_stalemate():
             print("Empate! O jogo terminou empatado 🤝️😐️")
             return True
@@ -222,7 +231,7 @@ def wait_for_opponent_move(chess_ui):
 
 def main():
     Common.authors()
-    model_path = "/home/bangoim/Documents/GitHub/Stockfish/src/stockfish"
+    model_path = "C:\GitHub\stockfish\stockfish.exe"
 
     while True:
         player_color_input = input("Escolha a cor das peças 0 (Brancas) ou 1 (Pretas): ")

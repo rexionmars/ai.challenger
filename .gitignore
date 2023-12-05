@@ -2,7 +2,9 @@ engines/Stockfish/*
 performance/inference/*.out
 performance/inference/board.svg
 performance/inference/*.txt
+performance/inference/utils/__pycache__/*
 
 venv
 *.xml
 *.iml
+*.pyc
