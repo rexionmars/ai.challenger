@@ -72,12 +72,15 @@ class ChessUI(QMainWindow):
             self.suggest_move()
 
     def update_board(self) -> None:
-        svg_data = chess.svg.board(self.board)
+        # Define a orientação com base na cor do jogador
+        orientation = chess.WHITE if self.player_color == 0 else chess.BLACK
+        svg_data = chess.svg.board(self.board, orientation=orientation)
         with open(self.SVG_FILENAME, 'w') as svg_file:
             svg_file.write(svg_data)
 
         self.svg_widget.load(self.SVG_FILENAME)
         self.svg_widget.show()
+
 
     def suggest_move(self) -> None:
         result = self.engine.play(self.board, self.engine_limit_config)
