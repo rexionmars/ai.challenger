@@ -101,11 +101,11 @@ class ChessUI(QMainWindow):
         if self.board.is_checkmate():
             # Se for a vez das brancas jogar, e estivermos com as brancas, perdemos
             if self.board.turn and self.player_color == 0:
-                print("Xeque-mate! Fomos de Americanas 💔️😭️")
+                print("Erro contábil no Xeque! Fomos de Americanas 💔️😭️")
                 return True
             # Se for a vez das pretas jogar, e estivermos com as pretas, perdemos
             elif not self.board.turn and self.player_color == 1:
-                print("Xeque-mate! FAZ O L 💔️😭️")
+                print("Receba esse Xeque! FAZ O L GAROTINHO 💔️😭️")
                 return True
             else:
                 print("Xeque-mate! TACA O PAU 🏆️🎉️")
